@@ -1,3 +1,4 @@
 sample_dataset/images/
 .ipynb_checkpoints/
 sample_dataset.zip
+__pycache__/
