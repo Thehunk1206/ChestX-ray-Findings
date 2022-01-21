@@ -27,39 +27,41 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 import tensorflow as tf
 
-from tensorflow.keras.losses import Loss, binary_crossentropy
-
+from tensorflow.keras.losses import Loss
+# TODO: ADD Doc String
 # A Weighted Cross Entropy Loss for multi-label classification.
 class WeightedBinaryCrossEntropy(Loss):
-    def __init__(self, pos_w: float, from_logits:bool=False, name: str = 'weighted_binary_crossentropy'):
+    def __init__(self, from_logits:bool=False, name: str = 'weighted_binary_crossentropy'):
         super(WeightedBinaryCrossEntropy, self).__init__(name=name)
-        self.pos_w = pos_w
-        self.neg_w = 1.0 - pos_w
+        self.pos_w = None
+        self.neg_w = None
         self.epsilon = 1e-8
         self.from_logits = from_logits
 
+    @tf.function
     def call(self, y_true: tf.Tensor, y_pred:tf.Tensor)-> tf.Tensor:
         assert y_pred.shape == y_true.shape, f'Shape mismatch: y_pred.shape={y_pred.shape}, y_true.shape={y_true.shape}'
 
         y_true = tf.cast(y_true, tf.float32)
         y_pred = tf.cast(y_pred, tf.float32)
 
+
         if self.from_logits:
             y_pred = tf.math.sigmoid(y_pred)
         
         # Compute the weighted cross entropy.
+        self.pos_w = tf.reduce_mean(y_true, axis= 0)
+        self.neg_w = 1 - self.pos_w 
         loss = -(self.pos_w * y_true * tf.math.log(y_pred+self.epsilon) + self.neg_w * (1.0 - y_true) * tf.math.log(1.0 - y_pred+self.epsilon))
 
         return loss
     
-    def get_config(self):
-        config = super(WeightedBinaryCrossEntropy, self).get_config()
+    def get_config(self) -> dict:
+        config = super().get_config()
         config.update({
-            'pos_w': self.pos_w,
-            'neg_w': self.neg_w,
-            'epsilon': self.epsilon,
             'from_logits': self.from_logits
         })
+        return config
 
     @classmethod
     def from_config(cls, config):
@@ -74,6 +76,7 @@ class SigmoidFocalLoss(Loss):
         self.from_logits = from_logits
         self.epsilon = 1e-8
     
+    @tf.function
     def call(self, y_true:tf.Tensor, y_pred:tf.Tensor)->tf.Tensor:
         assert y_pred.shape == y_true.shape, f'Shape mismatch: y_pred.shape={y_pred.shape}, y_true.shape={y_true.shape}'
 
@@ -91,8 +94,8 @@ class SigmoidFocalLoss(Loss):
         
         return loss
     
-    def get_config(self):
-        config = super(SigmoidFocalLoss, self).get_config()
+    def get_config(self)-> dict:
+        config = super().get_config()
         config.update({
             'alpha': self.alpha,
             'gamma': self.gamma,
@@ -117,12 +120,14 @@ if __name__ == "__main__":
 
     pos_w =  tf.reduce_sum(dummy_label, axis=0) / dummy_label.shape[0]
 
-    wbce = WeightedBinaryCrossEntropy(pos_w)
+    wbce = WeightedBinaryCrossEntropy()
     loss1 = wbce(dummy_label, dumm_pred1)
     loss2 = wbce(dummy_label, dumm_pred2)
     tf.print(f'BCE Loss1: {loss1}\nBCE Loss2: {loss2}')
+    tf.print(wbce.get_config())
 
     focal = SigmoidFocalLoss()
     loss3 = focal(dummy_label, dumm_pred1)
     loss4 = focal(dummy_label, dumm_pred2)
     tf.print(f'Focal Loss1: {loss3}\nFocal Loss2: {loss4}')
+    tf.print(focal.get_config())
