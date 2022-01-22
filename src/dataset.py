@@ -40,7 +40,7 @@ class TfdataPipeline:
         IMG_H: int = 224,
         IMG_W: int = 224,
         IMG_C: int = 3,
-        batch_size: int = 8,
+        batch_size: int = 8
     ) -> None:
         if not os.path.exists(BASE_DATASET_DIR):
             raise ValueError('The dataset directory does not exist')
@@ -95,13 +95,12 @@ class TfdataPipeline:
         returns:
             tf.Tensor, The augmented image
         '''
-        aug = Sequential([
-            layers.RandomRotation(factor = 0.05, seed = 42, fill_mode = 'constant', fill_value = 0.0),
-            layers.RandomContrast(factor = 0.2, seed = 42),
-        ])
-        return aug(image, training=True)
+        image = tf.image.random_contrast(image, 0.3, 0.6)
+        image = tf.image.random_brightness(image, 0.4)
+        image = tf.image.random_jpeg_quality(image, 70, 100)
+        return image
     
-    def _tf_dataset(self, image_path: tf.Tensor, labels: tf.Tensor) -> DatasetV2:
+    def _tf_dataset(self, image_path: tf.Tensor, labels: tf.Tensor, do_augment:bool = True) -> DatasetV2:
         '''
         Creates a tf.data.Dataset object from the image path and labels
         args:
@@ -112,7 +111,7 @@ class TfdataPipeline:
         '''
         dataset = tf.data.Dataset.from_tensor_slices((image_path, labels))
         dataset = (dataset
-                        .map(lambda x, y: (self._augment(self._read_image(x)), y), 
+                        .map(lambda x, y: (self._augment(self._read_image(x)), y) if do_augment else (self._read_image(x), y),
                         num_parallel_calls=tf.data.AUTOTUNE)
                         .shuffle(buffer_size=256)
                         .batch(self.batch_size)
@@ -120,7 +119,7 @@ class TfdataPipeline:
         )
         return dataset
 
-    def load_dataset(self, path_to_csv: str) -> DatasetV2:
+    def load_dataset(self, path_to_csv: str, do_augmemt:bool = True) -> DatasetV2:
         '''
         This function is used to get the dataset
         args:
@@ -130,12 +129,13 @@ class TfdataPipeline:
         '''
         path_to_csv = os.path.join(self.BASE_DATASET_DIR, path_to_csv)
         image_paths, labels = self._load_image_path_and_labels(path_to_csv)
-        dataset = self._tf_dataset(image_paths, labels)
+        dataset = self._tf_dataset(image_paths, labels, do_augmemt)
         return dataset
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     tf_dataset = TfdataPipeline(BASE_DATASET_DIR='./sample_dataset/', IMG_H=224, IMG_W=224, IMG_C=3, batch_size=1)
-    dataset = tf_dataset.load_dataset('train_labels.csv')
-    for image, label in dataset.take(40):
-        print(image.shape, label.shape)
+    dataset = tf_dataset.load_dataset('train_labels.csv', do_augmemt=True)
+    for image, label in dataset.take(1):
+        plt.imshow(image[0].numpy())
+    plt.show()
