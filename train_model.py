@@ -72,7 +72,7 @@ def train(
         batch_size=batch_size
     )
 
-    train_ds = tf_dataset.load_dataset(train_csv_filename, do_augmentation=do_augmentation)
+    train_ds = tf_dataset.load_dataset(train_csv_filename, do_augmemt=do_augmentation)
     valid_ds = tf_dataset.load_dataset(validation_csv_filename, do_augmemt=False)
 
     # Intantiate Optimizer
