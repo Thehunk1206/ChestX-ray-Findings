@@ -62,8 +62,7 @@ class ChestXrayNet(Model):
             include_top=False,
             input_shape=self.inshape
         )
-        for i in range(len(self.base_model.layers)-10):
-            self.base_model.layers[i].trainable = self.base_model_trainable
+        self.base_model.trainable = self.base_model_trainable
 
         self.global_average_pooling = layers.GlobalAveragePooling2D(keepdims=True)
         self.flatten = layers.Flatten()
@@ -84,7 +83,7 @@ class ChestXrayNet(Model):
 
 if __name__ == '__main__':
     input_shape = (224,224,3)
-    base_model_name = 'resnet50'
+    base_model_name = 'densenet121'
     dumm_input = tf.random.normal(shape=(8,224,224,3))
 
     model = ChestXrayNet(
@@ -93,4 +92,4 @@ if __name__ == '__main__':
     )
     out = model(dumm_input)
     tf.print(out.shape)
-    model.summary()
+    print(model.base_model.layers[:10])
