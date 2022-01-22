@@ -75,7 +75,6 @@ def train(
 
     train_ds = tf_dataset.load_dataset(train_csv_filename, do_augmemt=do_augmentation)
     valid_ds = tf_dataset.load_dataset(validation_csv_filename, do_augmemt=False)
-    _, labels = train_ds.take(1)
 
     # Intantiate Optimizer
     optimizer = Adam(learning_rate=lr)
@@ -90,7 +89,7 @@ def train(
 
 
     # Create Model
-    model = ChestXrayNet(inshape=(IMG_H, IMG_W, IMG_C), base_model_name=base_model_name, num_classes=len(labels))
+    model = ChestXrayNet(inshape=(IMG_H, IMG_W, IMG_C), base_model_name=base_model_name, num_classes=14)
 
     # Compile Model
     model.compile(optimizer=optimizer, loss=loss, metrics=[BinaryAccuracy(), AUC()])

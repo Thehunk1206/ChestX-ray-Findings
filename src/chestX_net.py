@@ -22,7 +22,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 '''
 
-from cProfile import label
 import os 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
