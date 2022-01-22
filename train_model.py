@@ -28,6 +28,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.metrics import BinaryAccuracy, Precision, Recall, AUC
 
 from src.chestX_net import ChestXrayNet
 from src.dataset import TfdataPipeline
@@ -91,7 +92,7 @@ def train(
     model = ChestXrayNet(inshape=(IMG_H, IMG_W, IMG_C), base_model_name=base_model_name, num_classes=14)
 
     # Compile Model
-    model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
+    model.compile(optimizer=optimizer, loss=loss, metrics=[BinaryAccuracy(), Precision(), Recall(), AUC()])
 
     # Create Checkpoint
     checkpoint_path = os.path.join(checkpoint_dir, f'checkpoint-{base_model_name}-{loss_name}')
