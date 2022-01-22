@@ -50,6 +50,7 @@ def train(
     epochs:int = 100,
     base_model_name:str = 'resnet50',
     loss_name:str = 'w_binary_crossentropy',
+    do_augmentation:bool = True,
 ):
     assert base_model_name in __supported_models__, f'{base_model_name} is not supported, supported models are {__supported_models__}'
     assert loss_name in __supported_losses__, f'{loss_name} is not supported, supported losses are {__supported_losses__}'
@@ -71,7 +72,7 @@ def train(
         batch_size=batch_size
     )
 
-    train_ds = tf_dataset.load_dataset(train_csv_filename)
+    train_ds = tf_dataset.load_dataset(train_csv_filename, do_augmentation=do_augmentation)
     valid_ds = tf_dataset.load_dataset(validation_csv_filename, do_augmemt=False)
 
     # Intantiate Optimizer
@@ -123,6 +124,7 @@ if __name__ == "__main__":
     parser.add_argument('--epochs', type=int, default=100, help='Number of Epochs')
     parser.add_argument('--base_model_name', type=str, default='resnet50', help='Base Model Name')
     parser.add_argument('--loss_name', type=str, default='w_binary_crossentropy', help='Loss Name')
+    parser.add_argument('--do_augmentation', type=int, default=1, help='Do Augmentation', choices=[0, 1])
     args = parser.parse_args()
 
     train(
@@ -138,6 +140,7 @@ if __name__ == "__main__":
         epochs=args.epochs,
         base_model_name=args.base_model_name,
         loss_name=args.loss_name,
+        do_augmentation=bool(args.do_augmentation)
     )
 
 
