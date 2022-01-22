@@ -82,9 +82,9 @@ class TfdataPipeline:
         '''
         image_string    = tf.io.read_file(image_path)
         image           = tf.io.decode_image(image_string, channels=1, expand_animations=False)
-        image           = tf.image.convert_image_dtype(image, dtype=tf.float32)
         image           = tf.image.resize(image, [self.IMG_H, self.IMG_W], method = tf.image.ResizeMethod.BICUBIC)
         image           = tf.image.grayscale_to_rgb(image)
+        image           = tf.clip_by_value(image, 0, 255)
         return image
 
     def _augment(self, image:tf.Tensor) -> Sequential:
@@ -95,8 +95,8 @@ class TfdataPipeline:
         returns:
             tf.Tensor, The augmented image
         '''
-        image = tf.image.random_contrast(image, 0.3, 0.6)
-        image = tf.image.random_brightness(image, 0.4)
+        # image = tf.image.random_contrast(image, 0.2, 0.4)
+        # image = tf.image.random_brightness(image, 0.4)
         image = tf.image.random_jpeg_quality(image, 70, 100)
         return image
     
@@ -135,7 +135,8 @@ class TfdataPipeline:
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     tf_dataset = TfdataPipeline(BASE_DATASET_DIR='./sample_dataset/', IMG_H=224, IMG_W=224, IMG_C=3, batch_size=1)
-    dataset = tf_dataset.load_dataset('train_labels.csv', do_augmemt=True)
+    dataset = tf_dataset.load_dataset('train_labels.csv', do_augmemt=False)
     for image, label in dataset.take(1):
-        plt.imshow(image[0].numpy())
+        plt.imshow(image[0].numpy().astype(np.uint8))
+        plt.title(label[0].numpy())
     plt.show()

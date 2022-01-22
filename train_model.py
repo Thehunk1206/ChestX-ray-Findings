@@ -28,7 +28,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import ModelCheckpoint
-from tensorflow.keras.metrics import BinaryAccuracy, Precision, Recall, AUC
+from tensorflow.keras.metrics import BinaryAccuracy, AUC
 
 from src.chestX_net import ChestXrayNet
 from src.dataset import TfdataPipeline
@@ -75,6 +75,7 @@ def train(
 
     train_ds = tf_dataset.load_dataset(train_csv_filename, do_augmemt=do_augmentation)
     valid_ds = tf_dataset.load_dataset(validation_csv_filename, do_augmemt=False)
+    _, labels = train_ds.take(1)
 
     # Intantiate Optimizer
     optimizer = Adam(learning_rate=lr)
@@ -89,14 +90,14 @@ def train(
 
 
     # Create Model
-    model = ChestXrayNet(inshape=(IMG_H, IMG_W, IMG_C), base_model_name=base_model_name, num_classes=14)
+    model = ChestXrayNet(inshape=(IMG_H, IMG_W, IMG_C), base_model_name=base_model_name, num_classes=len(labels))
 
     # Compile Model
-    model.compile(optimizer=optimizer, loss=loss, metrics=[BinaryAccuracy(), Precision(), Recall(), AUC()])
+    model.compile(optimizer=optimizer, loss=loss, metrics=[BinaryAccuracy(), AUC()])
 
     # Create Checkpoint
     checkpoint_path = os.path.join(checkpoint_dir, f'checkpoint-{base_model_name}-{loss_name}')
-    checkpoint = ModelCheckpoint(checkpoint_path, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')
+    checkpoint = ModelCheckpoint(checkpoint_path, monitor='val_auc', verbose=1, save_best_only=True, mode='max')
 
     # Train Model
     model.summary()

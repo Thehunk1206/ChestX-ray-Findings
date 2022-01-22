@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 '''
 
+from cProfile import label
 import os 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
@@ -69,6 +70,8 @@ class ChestXrayNet(Model):
         self.dense_layer = layers.Dense(self.num_classes, kernel_regularizer=tf.keras.regularizers.l2(0.01))
 
     def call(self, inputs:tf.Tensor, training=None):
+        if self.base_model_name in ['resnet50', 'densenet121']:
+            inputs = layers.Rescaling(1./255)(inputs)
         x = self.base_model(inputs)
         x = self.global_average_pooling(x)
         x = self.flatten(x)
@@ -83,7 +86,7 @@ class ChestXrayNet(Model):
 
 if __name__ == '__main__':
     input_shape = (224,224,3)
-    base_model_name = 'densenet121'
+    base_model_name = 'efficientnet'
     dumm_input = tf.random.normal(shape=(8,224,224,3))
 
     model = ChestXrayNet(
@@ -92,4 +95,5 @@ if __name__ == '__main__':
     )
     out = model(dumm_input)
     tf.print(out.shape)
+    model.summary()
     print(model.base_model.layers[:10])

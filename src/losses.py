@@ -110,10 +110,10 @@ class SigmoidFocalLoss(Loss):
 
 if __name__ == "__main__":
     
-    dummy_label = tf.constant([ [0, 1, 1, 0], 
-                                [1, 0, 0, 1],
-                                [1, 0, 0, 1],
-                                [0, 1, 1, 0]], dtype=tf.float32)
+    dummy_label = tf.constant([ [0, 1, 1, 1], 
+                                [1, 0, 1, 1],
+                                [1, 1, 0, 1],
+                                [1, 0, 0, 1]], dtype=tf.float32)
 
     dumm_pred1 = 0.9 * tf.ones_like(dummy_label)
     dumm_pred2 = 0.1 * tf.ones_like(dummy_label)
