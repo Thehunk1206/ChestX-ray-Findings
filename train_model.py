@@ -77,7 +77,7 @@ def train(
     valid_ds = tf_dataset.load_dataset(validation_csv_filename)
 
     # Intantiate Optimizer
-    optimizer = Adam(lr=lr)
+    optimizer = Adam(learning_rate=lr)
 
     # Instantiate Losses
     if loss_name == 'w_binary_crossentropy':

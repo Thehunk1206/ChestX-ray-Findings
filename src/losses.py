@@ -40,7 +40,7 @@ class WeightedBinaryCrossEntropy(Loss):
 
     @tf.function
     def call(self, y_true: tf.Tensor, y_pred:tf.Tensor)-> tf.Tensor:
-        assert y_pred.shape == y_true.shape, f'Shape mismatch: y_pred.shape={y_pred.shape}, y_true.shape={y_true.shape}'
+        # assert y_pred.shape == y_true.shape, f'Shape mismatch: y_pred.shape={y_pred.shape}, y_true.shape={y_true.shape}'
 
         y_true = tf.cast(y_true, tf.float32)
         y_pred = tf.cast(y_pred, tf.float32)
@@ -78,7 +78,7 @@ class SigmoidFocalLoss(Loss):
     
     @tf.function
     def call(self, y_true:tf.Tensor, y_pred:tf.Tensor)->tf.Tensor:
-        assert y_pred.shape == y_true.shape, f'Shape mismatch: y_pred.shape={y_pred.shape}, y_true.shape={y_true.shape}'
+        # assert y_pred.shape == y_true.shape, f'Shape mismatch: y_pred.shape={y_pred.shape}, y_true.shape={y_true.shape}'
 
         y_true = tf.cast(y_true, tf.float32)
         y_pred = tf.cast(y_pred, tf.float32)
