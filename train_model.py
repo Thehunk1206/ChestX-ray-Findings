@@ -74,7 +74,7 @@ def train(
     )
 
     train_ds = tf_dataset.load_dataset(train_csv_filename)
-    valid_ds = tf_dataset.load_dataset(validation_csv_filename)
+    valid_ds = tf_dataset.load_dataset(validation_csv_filename, do_augmemt=False)
 
     # Intantiate Optimizer
     optimizer = Adam(learning_rate=lr)
@@ -99,6 +99,7 @@ def train(
     checkpoint = ModelCheckpoint(checkpoint_path, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')
 
     # Train Model
+    model.summary()
     history = model.fit(
         train_ds,
         validation_data=valid_ds,
