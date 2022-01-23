@@ -26,6 +26,7 @@ import os
 import argparse
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
+from tensorflow.keras import models
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.metrics import BinaryAccuracy, AUC
@@ -43,6 +44,7 @@ def train(
     train_csv_filename:str = 'train_labels.csv',
     validation_csv_filename:str = 'valid_labels.csv',
     checkpoint_dir:str='save_model/',
+    pretrained_model_checkpoint:str=None,
     IMG_H:int = 224,
     IMG_W:int = 224,
     IMG_C:int = 3,
@@ -89,7 +91,11 @@ def train(
 
 
     # Create Model
-    model = ChestXrayNet(inshape=(IMG_H, IMG_W, IMG_C), base_model_name=base_model_name, num_classes=14)
+    if pretrained_model_checkpoint is not None:
+        assert os.path.exists(pretrained_model_checkpoint), f'{pretrained_model_checkpoint} does not exist'
+        model = models.load_model(pretrained_model_checkpoint, compile=True)
+    else:
+        model = ChestXrayNet(inshape=(IMG_H, IMG_W, IMG_C), base_model_name=base_model_name, num_classes=14)
 
     # Compile Model
     model.compile(optimizer=optimizer, loss=loss, metrics=[BinaryAccuracy(), AUC()])
@@ -114,6 +120,7 @@ def train(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset_base_dir', type=str, required=True, help='Base Directory of the Dataset')
+    parser.add_argument('--pretrained_model_checkpoint', type=str, default=None, help='Pretrained Model Checkpoint')
     parser.add_argument('--train_csv_filename', type=str, default='train_labels.csv', help='Train CSV Filename')
     parser.add_argument('--validation_csv_filename', type=str, default='valid_labels.csv', help='Validation CSV Filename')
     parser.add_argument('--checkpoint_dir', type=str, default='save_model/', help='Checkpoint Directory')
@@ -130,6 +137,7 @@ if __name__ == "__main__":
 
     train(
         dataset_base_dir=args.dataset_base_dir,
+        pretrained_model_checkpoint=args.pretrained_model_checkpoint,
         train_csv_filename=args.train_csv_filename,
         validation_csv_filename=args.validation_csv_filename,
         checkpoint_dir=args.checkpoint_dir,
@@ -143,8 +151,3 @@ if __name__ == "__main__":
         loss_name=args.loss_name,
         do_augmentation=bool(args.do_augmentation)
     )
-
-
-
-
-
