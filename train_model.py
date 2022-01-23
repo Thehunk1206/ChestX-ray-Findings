@@ -93,7 +93,7 @@ def train(
     # Create Model
     if pretrained_model_checkpoint is not None:
         assert os.path.exists(pretrained_model_checkpoint), f'{pretrained_model_checkpoint} does not exist'
-        model = models.load_model(pretrained_model_checkpoint, compile=True)
+        model = models.load_model(pretrained_model_checkpoint, custom_objects={'SigmoidFocalLoss': SigmoidFocalLoss})
     else:
         model = ChestXrayNet(inshape=(IMG_H, IMG_W, IMG_C), base_model_name=base_model_name, num_classes=14)
 
