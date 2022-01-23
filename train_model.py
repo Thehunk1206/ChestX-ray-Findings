@@ -54,6 +54,7 @@ def train(
     base_model_name:str = 'resnet50',
     loss_name:str = 'w_binary_crossentropy',
     do_augmentation:bool = True,
+    trainable_layers:int = 10,
 ):
     assert base_model_name in __supported_models__, f'{base_model_name} is not supported, supported models are {__supported_models__}'
     assert loss_name in __supported_losses__, f'{loss_name} is not supported, supported losses are {__supported_losses__}'
@@ -95,7 +96,7 @@ def train(
         assert os.path.exists(pretrained_model_checkpoint), f'{pretrained_model_checkpoint} does not exist'
         model = models.load_model(pretrained_model_checkpoint, custom_objects={'SigmoidFocalLoss': SigmoidFocalLoss})
     else:
-        model = ChestXrayNet(inshape=(IMG_H, IMG_W, IMG_C), base_model_name=base_model_name, num_classes=14)
+        model = ChestXrayNet(inshape=(IMG_H, IMG_W, IMG_C), base_model_name=base_model_name, num_classes=14, trainable_layers=trainable_layers)
 
     # Compile Model
     model.compile(optimizer=optimizer, loss=loss, metrics=[BinaryAccuracy(), AUC()])

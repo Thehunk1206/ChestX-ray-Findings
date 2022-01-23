@@ -39,6 +39,7 @@ class ChestXrayNet(Model):
         base_model_weights:str='imagenet',
         base_model_trainable:bool=False,
         num_classes:int=14,
+        trainable_layers:int = 10,
         *args, 
         **kwargs
     ):
@@ -49,6 +50,7 @@ class ChestXrayNet(Model):
         self.base_model_weights = base_model_weights
         self.base_model_trainable = base_model_trainable
         self.num_classes = num_classes
+        self.trainable_layers = trainable_layers
 
         base_model_dict = {
             'resnet50': ResNet50,
@@ -62,7 +64,8 @@ class ChestXrayNet(Model):
             include_top=False,
             input_shape=self.inshape
         )
-        self.base_model.trainable = self.base_model_trainable
+        for i in range(len(self.base_model.layers) - self.trainable_layers):
+            self.base_model.layers[i].trainable = self.base_model_trainable
 
         self.global_average_pooling = layers.GlobalAveragePooling2D(keepdims=True)
         self.flatten = layers.Flatten()
