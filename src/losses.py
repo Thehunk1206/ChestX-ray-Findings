@@ -31,8 +31,8 @@ from tensorflow.keras.losses import Loss
 # TODO: ADD Doc String
 # A Weighted Cross Entropy Loss for multi-label classification.
 class WeightedBinaryCrossEntropy(Loss):
-    def __init__(self, from_logits:bool=False, name: str = 'weighted_binary_crossentropy'):
-        super(WeightedBinaryCrossEntropy, self).__init__(name=name)
+    def __init__(self, from_logits:bool=False, name: str = 'weighted_binary_crossentropy', **kwargs):
+        super(WeightedBinaryCrossEntropy, self).__init__(name=name, **kwargs)
         self.pos_w = None
         self.neg_w = None
         self.epsilon = 1e-8
