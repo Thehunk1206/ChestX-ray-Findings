@@ -151,6 +151,6 @@ if __name__ == "__main__":
         epochs=args.epochs,
         base_model_name=args.base_model_name,
         loss_name=args.loss_name,
-        do_augmentation=bool(args.do_augmentation)
+        do_augmentation=bool(args.do_augmentation),
         trainable_layers=args.trainable_layers
     )
