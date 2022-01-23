@@ -136,7 +136,5 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
     tf_dataset = TfdataPipeline(BASE_DATASET_DIR='./sample_dataset/', IMG_H=224, IMG_W=224, IMG_C=3, batch_size=1)
     dataset = tf_dataset.load_dataset('train_labels.csv', do_augmemt=False)
-    for image, label in dataset.take(1):
-        plt.imshow(image[0].numpy().astype(np.uint8))
-        plt.title(label[0].numpy())
-    plt.show()
+    for image, label in dataset:
+        tf.print(image.shape)

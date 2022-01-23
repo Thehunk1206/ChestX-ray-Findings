@@ -134,6 +134,7 @@ if __name__ == "__main__":
     parser.add_argument('--base_model_name', type=str, default='resnet50', help='Base Model Name')
     parser.add_argument('--loss_name', type=str, default='w_binary_crossentropy', help='Loss Name')
     parser.add_argument('--do_augmentation', type=int, default=1, help='Do Augmentation', choices=[0, 1])
+    parser.add_argument('--trainable_layers', type=int, default=10, help='Number of Trainable Layers')
     args = parser.parse_args()
 
     train(
@@ -151,4 +152,5 @@ if __name__ == "__main__":
         base_model_name=args.base_model_name,
         loss_name=args.loss_name,
         do_augmentation=bool(args.do_augmentation)
+        trainable_layers=args.trainable_layers
     )
