@@ -69,8 +69,8 @@ class WeightedBinaryCrossEntropy(Loss):
 
 
 class SigmoidFocalLoss(Loss):
-    def __init__(self, alpha:float = 0.25, gamma:float = 2.0, from_logits:bool = False, name:str='focal_loss'):
-        super(SigmoidFocalLoss, self).__init__(name=name)
+    def __init__(self, alpha:float = 0.25, gamma:float = 2.0, from_logits:bool = False, name:str='focal_loss', **kwargs):
+        super(SigmoidFocalLoss, self).__init__(name=name, **kwargs)
         self.alpha = alpha
         self.gamma = gamma
         self.from_logits = from_logits
