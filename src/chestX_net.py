@@ -85,6 +85,20 @@ class ChestXrayNet(Model):
         x = layers.Input(shape=self.inshape)
         model = Model(inputs=[x], outputs=self.call(x), name='ChestXrayNet')
         model.summary(*args, **kwargs)
+    
+    def get_config(self):
+        return {
+            'inshape': self.inshape,
+            'base_model_name': self.base_model_name,
+            'base_model_weights': self.base_model_weights,
+            'base_model_trainable':self.base_model_trainable,
+            'num_classes': self.num_classes,
+            'trainable_layers': self.trainable_layers
+        }
+    
+    @classmethod
+    def from_config(cls, config):
+        return cls(**config)
 
 if __name__ == '__main__':
     input_shape = (224,224,3)
