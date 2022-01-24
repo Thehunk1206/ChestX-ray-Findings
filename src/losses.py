@@ -52,7 +52,7 @@ class WeightedBinaryCrossEntropy(Loss):
         # Compute the weighted cross entropy.
         self.pos_w = tf.reduce_mean(y_true, axis= 0)
         self.neg_w = 1 - self.pos_w 
-        loss = -(self.pos_w * y_true * tf.math.log(y_pred+self.epsilon) + self.neg_w * (1.0 - y_true) * tf.math.log(1.0 - y_pred+self.epsilon))
+        loss = -(self.neg_w * y_true * tf.math.log(y_pred+self.epsilon) + self.pos_w * (1.0 - y_true) * tf.math.log(1.0 - y_pred+self.epsilon))
 
         return loss
     
@@ -89,8 +89,8 @@ class SigmoidFocalLoss(Loss):
 
         # Compute the focal loss.
         loss = -(
-            self.alpha * y_true * tf.math.pow(1.0 - y_pred, self.gamma) * tf.math.log(y_pred+self.epsilon) +
-            (1.0 - self.alpha) * (1.0 - y_true) * tf.math.pow(y_pred, self.gamma) * tf.math.log(1.0 - y_pred+self.epsilon)
+            (1.0 - self.alpha) * y_true * tf.math.pow(1.0 - y_pred, self.gamma) * tf.math.log(y_pred+self.epsilon) +
+            self.alpha * (1.0 - y_true) * tf.math.pow(y_pred, self.gamma) * tf.math.log(1.0 - y_pred+self.epsilon)
         )
         
         return loss
