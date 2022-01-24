@@ -69,9 +69,9 @@ class WeightedBinaryCrossEntropy(Loss):
 
 
 class SigmoidFocalLoss(Loss):
-    def __init__(self, alpha:float = 0.25, gamma:float = 2.0, from_logits:bool = False, name:str='focal_loss', **kwargs):
+    def __init__(self, gamma:float = 3.0, from_logits:bool = False, name:str='focal_loss', **kwargs):
         super(SigmoidFocalLoss, self).__init__(name=name, **kwargs)
-        self.alpha = alpha
+        self.alpha = None
         self.gamma = gamma
         self.from_logits = from_logits
         self.epsilon = 1e-8
@@ -79,6 +79,7 @@ class SigmoidFocalLoss(Loss):
     @tf.function
     def call(self, y_true:tf.Tensor, y_pred:tf.Tensor)->tf.Tensor:
         # assert y_pred.shape == y_true.shape, f'Shape mismatch: y_pred.shape={y_pred.shape}, y_true.shape={y_true.shape}'
+        self.alpha = tf.reduce_mean(y_true, axis=0)
 
         y_true = tf.cast(y_true, tf.float32)
         y_pred = tf.cast(y_pred, tf.float32)
@@ -97,7 +98,6 @@ class SigmoidFocalLoss(Loss):
     def get_config(self)-> dict:
         config = super().get_config()
         config.update({
-            'alpha': self.alpha,
             'gamma': self.gamma,
             'from_logits': self.from_logits
         })
@@ -110,7 +110,7 @@ class SigmoidFocalLoss(Loss):
 
 if __name__ == "__main__":
     
-    dummy_label = tf.constant([ [0, 1, 1, 1], 
+    dummy_label = tf.constant([ [1, 1, 1, 1], 
                                 [1, 0, 1, 1],
                                 [1, 1, 0, 1],
                                 [1, 0, 0, 1]], dtype=tf.float32)
@@ -118,7 +118,6 @@ if __name__ == "__main__":
     dumm_pred1 = 0.9 * tf.ones_like(dummy_label)
     dumm_pred2 = 0.1 * tf.ones_like(dummy_label)
 
-    pos_w =  tf.reduce_sum(dummy_label, axis=0) / dummy_label.shape[0]
 
     wbce = WeightedBinaryCrossEntropy()
     loss1 = wbce(dummy_label, dumm_pred1)
